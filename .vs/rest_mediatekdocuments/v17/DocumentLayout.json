@@ -3,12 +3,52 @@
   "WorkspaceRootPath": "C:\\wamp64\\www\\rest_mediatekdocuments\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\wamp64\\www\\rest_mediatekdocuments\\README.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:README.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\wamp64\\www\\rest_mediatekdocuments\\src\\MyAccessBDD.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\MyAccessBDD.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\wamp64\\www\\rest_mediatekdocuments\\src\\Url.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\Url.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\wamp64\\www\\rest_mediatekdocuments\\src\\index.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\index.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\wamp64\\www\\rest_mediatekdocuments\\src\\Controle.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\Controle.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\wamp64\\www\\rest_mediatekdocuments\\src\\Connexion.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\Connexion.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\wamp64\\www\\rest_mediatekdocuments\\src\\AccessBDD.php||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\AccessBDD.php||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\wamp64\\www\\rest_mediatekdocuments\\vendor\\vlucas\\phpdotenv\\.github\\workflows\\tests.yml||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:vendor\\vlucas\\phpdotenv\\.github\\workflows\\tests.yml||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\wamp64\\www\\rest_mediatekdocuments\\vendor\\vlucas\\phpdotenv\\.github\\workflows\\static.yml||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:vendor\\vlucas\\phpdotenv\\.github\\workflows\\static.yml||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\wamp64\\www\\rest_mediatekdocuments\\vendor\\vlucas\\phpdotenv\\.github\\CONTRIBUTING.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:vendor\\vlucas\\phpdotenv\\.github\\CONTRIBUTING.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\wamp64\\www\\rest_mediatekdocuments\\vendor\\vlucas\\phpdotenv\\.github\\CODE_OF_CONDUCT.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:vendor\\vlucas\\phpdotenv\\.github\\CODE_OF_CONDUCT.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\wamp64\\www\\rest_mediatekdocuments\\src\\.env||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\.env||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\wamp64\\www\\rest_mediatekdocuments\\README.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:README.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,41 +58,160 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "README.md",
-              "DocumentMoniker": "C:\\wamp64\\www\\rest_mediatekdocuments\\README.md",
-              "RelativeDocumentMoniker": "README.md",
-              "ToolTip": "C:\\wamp64\\www\\rest_mediatekdocuments\\README.md",
-              "RelativeToolTip": "README.md",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAeAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
-              "WhenOpened": "2026-02-02T22:45:14.013Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
+              "Title": "Controle.php",
+              "DocumentMoniker": "C:\\wamp64\\www\\rest_mediatekdocuments\\src\\Controle.php",
+              "RelativeDocumentMoniker": "src\\Controle.php",
+              "ToolTip": "C:\\wamp64\\www\\rest_mediatekdocuments\\src\\Controle.php",
+              "RelativeToolTip": "src\\Controle.php",
+              "ViewState": "AgIAABQAAAAAAAAAAAAcwE0AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-02-04T00:15:31.058Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "index.php",
+              "DocumentMoniker": "C:\\wamp64\\www\\rest_mediatekdocuments\\src\\index.php",
+              "RelativeDocumentMoniker": "src\\index.php",
+              "ToolTip": "C:\\wamp64\\www\\rest_mediatekdocuments\\src\\index.php",
+              "RelativeToolTip": "src\\index.php",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-02-04T00:15:23.358Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
               "Title": "MyAccessBDD.php",
               "DocumentMoniker": "C:\\wamp64\\www\\rest_mediatekdocuments\\src\\MyAccessBDD.php",
               "RelativeDocumentMoniker": "src\\MyAccessBDD.php",
               "ToolTip": "C:\\wamp64\\www\\rest_mediatekdocuments\\src\\MyAccessBDD.php",
               "RelativeToolTip": "src\\MyAccessBDD.php",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAEwBAAAAAAAAAAAAABgBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2026-02-02T22:41:28.592Z",
               "EditorCaption": ""
             },
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Url.php",
+              "DocumentMoniker": "C:\\wamp64\\www\\rest_mediatekdocuments\\src\\Url.php",
+              "RelativeDocumentMoniker": "src\\Url.php",
+              "ToolTip": "C:\\wamp64\\www\\rest_mediatekdocuments\\src\\Url.php",
+              "RelativeToolTip": "src\\Url.php",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-02-04T00:15:35.974Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Connexion.php",
+              "DocumentMoniker": "C:\\wamp64\\www\\rest_mediatekdocuments\\src\\Connexion.php",
+              "RelativeDocumentMoniker": "src\\Connexion.php",
+              "ToolTip": "C:\\wamp64\\www\\rest_mediatekdocuments\\src\\Connexion.php",
+              "RelativeToolTip": "src\\Connexion.php",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-02-04T02:24:15.454Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AccessBDD.php",
+              "DocumentMoniker": "C:\\wamp64\\www\\rest_mediatekdocuments\\src\\AccessBDD.php",
+              "RelativeDocumentMoniker": "src\\AccessBDD.php",
+              "ToolTip": "C:\\wamp64\\www\\rest_mediatekdocuments\\src\\AccessBDD.php",
+              "RelativeToolTip": "src\\AccessBDD.php",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAcwEMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-02-04T00:21:21.147Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "static.yml",
+              "DocumentMoniker": "C:\\wamp64\\www\\rest_mediatekdocuments\\vendor\\vlucas\\phpdotenv\\.github\\workflows\\static.yml",
+              "RelativeDocumentMoniker": "vendor\\vlucas\\phpdotenv\\.github\\workflows\\static.yml",
+              "ToolTip": "C:\\wamp64\\www\\rest_mediatekdocuments\\vendor\\vlucas\\phpdotenv\\.github\\workflows\\static.yml",
+              "RelativeToolTip": "vendor\\vlucas\\phpdotenv\\.github\\workflows\\static.yml",
+              "ViewState": "AgIAACoAAAAAAAAAAAAIwEYAAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
+              "WhenOpened": "2026-02-04T00:29:29.47Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "tests.yml",
+              "DocumentMoniker": "C:\\wamp64\\www\\rest_mediatekdocuments\\vendor\\vlucas\\phpdotenv\\.github\\workflows\\tests.yml",
+              "RelativeDocumentMoniker": "vendor\\vlucas\\phpdotenv\\.github\\workflows\\tests.yml",
+              "ToolTip": "C:\\wamp64\\www\\rest_mediatekdocuments\\vendor\\vlucas\\phpdotenv\\.github\\workflows\\tests.yml",
+              "RelativeToolTip": "vendor\\vlucas\\phpdotenv\\.github\\workflows\\tests.yml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEIAAABTAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
+              "WhenOpened": "2026-02-04T00:29:35.857Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "CONTRIBUTING.md",
+              "DocumentMoniker": "C:\\wamp64\\www\\rest_mediatekdocuments\\vendor\\vlucas\\phpdotenv\\.github\\CONTRIBUTING.md",
+              "RelativeDocumentMoniker": "vendor\\vlucas\\phpdotenv\\.github\\CONTRIBUTING.md",
+              "ToolTip": "C:\\wamp64\\www\\rest_mediatekdocuments\\vendor\\vlucas\\phpdotenv\\.github\\CONTRIBUTING.md",
+              "RelativeToolTip": "vendor\\vlucas\\phpdotenv\\.github\\CONTRIBUTING.md",
+              "ViewState": "AgIAAB0AAAAAAAAAAAAAAB0AAABbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2026-02-04T00:29:29.091Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "CODE_OF_CONDUCT.md",
+              "DocumentMoniker": "C:\\wamp64\\www\\rest_mediatekdocuments\\vendor\\vlucas\\phpdotenv\\.github\\CODE_OF_CONDUCT.md",
+              "RelativeDocumentMoniker": "vendor\\vlucas\\phpdotenv\\.github\\CODE_OF_CONDUCT.md",
+              "ToolTip": "C:\\wamp64\\www\\rest_mediatekdocuments\\vendor\\vlucas\\phpdotenv\\.github\\CODE_OF_CONDUCT.md",
+              "RelativeToolTip": "vendor\\vlucas\\phpdotenv\\.github\\CODE_OF_CONDUCT.md",
+              "ViewState": "AgIAAFMAAAAAAAAAAAASwG8AAABEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2026-02-04T00:29:00.646Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": ".env",
+              "DocumentMoniker": "C:\\wamp64\\www\\rest_mediatekdocuments\\src\\.env",
+              "RelativeDocumentMoniker": "src\\.env",
+              "ToolTip": "C:\\wamp64\\www\\rest_mediatekdocuments\\src\\.env",
+              "RelativeToolTip": "src\\.env",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-02-03T23:33:28.519Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "README.md",
+              "DocumentMoniker": "C:\\wamp64\\www\\rest_mediatekdocuments\\README.md",
+              "RelativeDocumentMoniker": "README.md",
+              "ToolTip": "C:\\wamp64\\www\\rest_mediatekdocuments\\README.md",
+              "RelativeToolTip": "README.md",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2026-02-02T22:45:14.013Z"
             }
           ]
         }

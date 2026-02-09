@@ -1,4 +1,4 @@
-Nuget<?php
+<?php
 include_once("AccessBDD.php");
 
 /**
@@ -63,6 +63,12 @@ class MyAccessBDD extends AccessBDD {
      */	
     protected function traitementInsert(string $table, ?array $champs) : ?int{
         switch($table){
+            case "livre" :
+                return $this->insertLivre($champs);
+            case "dvd" :
+                return $this->insertDvd($champs);
+            case "revue" :
+                return $this->insertRevue($champs);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
@@ -81,6 +87,12 @@ class MyAccessBDD extends AccessBDD {
      */	
     protected function traitementUpdate(string $table, ?string $id, ?array $champs) : ?int{
         switch($table){
+            case "livre" :
+                return $this->updateLivre($id, $champs);
+            case "dvd" :
+                return $this->updateDvd($id, $champs);
+            case "revue" :
+                return $this->updateRevue($id, $champs);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
@@ -98,6 +110,12 @@ class MyAccessBDD extends AccessBDD {
      */	
     protected function traitementDelete(string $table, ?array $champs) : ?int{
         switch($table){
+            case "livre" :
+                return $this->deleteLivre($champs);
+            case "dvd" :
+                return $this->deleteDvd($champs);
+            case "revue" :
+                return $this->deleteRevue($champs);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
@@ -275,6 +293,364 @@ class MyAccessBDD extends AccessBDD {
         $requete .= "where e.id = :id ";
         $requete .= "order by e.dateAchat DESC";
         return $this->conn->queryBDD($requete, $champNecessaire);
+    }
+
+    /**
+     * Insertion transactionnelle d'un livre (document + livres_dvd + livre).
+     * @param array|null $champs
+     * @return int|null
+     */
+    private function insertLivre(?array $champs) : ?int{
+        if (empty($champs)) {
+            return null;
+        }
+        $id = $this->getChamp($champs, ['id', 'Id']);
+        $titre = $this->getChamp($champs, ['titre', 'Titre']);
+        $image = $this->getChamp($champs, ['image', 'Image']);
+        $idRayon = $this->getChamp($champs, ['idRayon', 'idrayon', 'IdRayon']);
+        $idPublic = $this->getChamp($champs, ['idPublic', 'idpublic', 'IdPublic']);
+        $idGenre = $this->getChamp($champs, ['idGenre', 'idgenre', 'IdGenre']);
+        $isbn = $this->getChamp($champs, ['isbn', 'ISBN', 'Isbn'], true);
+        $auteur = $this->getChamp($champs, ['auteur', 'Auteur'], true);
+        $collection = $this->getChamp($champs, ['collection', 'Collection'], true);
+        if (!$this->requiredValues([$id, $titre, $idRayon, $idPublic, $idGenre])) {
+            return null;
+        }
+        $paramsDocument = [
+            'id' => $id,
+            'titre' => $titre,
+            'image' => $image,
+            'idRayon' => $idRayon,
+            'idPublic' => $idPublic,
+            'idGenre' => $idGenre
+        ];
+        $paramsSpecific = [
+            'id' => $id,
+            'isbn' => $isbn,
+            'auteur' => $auteur,
+            'collection' => $collection
+        ];
+        $operations = [
+            ['sql' => "insert into document (id, titre, image, idRayon, idPublic, idGenre) values (:id, :titre, :image, :idRayon, :idPublic, :idGenre)", 'params' => $paramsDocument, 'mustAffect' => true],
+            ['sql' => "insert into livres_dvd (id) values (:id)", 'params' => ['id' => $id], 'mustAffect' => true],
+            ['sql' => "insert into livre (id, ISBN, auteur, collection) values (:id, :isbn, :auteur, :collection)", 'params' => $paramsSpecific, 'mustAffect' => true]
+        ];
+        return $this->conn->updateBDDTransaction($operations);
+    }
+
+    /**
+     * Insertion transactionnelle d'un dvd (document + livres_dvd + dvd).
+     * @param array|null $champs
+     * @return int|null
+     */
+    private function insertDvd(?array $champs) : ?int{
+        if (empty($champs)) {
+            return null;
+        }
+        $id = $this->getChamp($champs, ['id', 'Id']);
+        $titre = $this->getChamp($champs, ['titre', 'Titre']);
+        $image = $this->getChamp($champs, ['image', 'Image']);
+        $idRayon = $this->getChamp($champs, ['idRayon', 'idrayon', 'IdRayon']);
+        $idPublic = $this->getChamp($champs, ['idPublic', 'idpublic', 'IdPublic']);
+        $idGenre = $this->getChamp($champs, ['idGenre', 'idgenre', 'IdGenre']);
+        $synopsis = $this->getChamp($champs, ['synopsis', 'Synopsis'], true);
+        $realisateur = $this->getChamp($champs, ['realisateur', 'Realisateur'], true);
+        $duree = $this->getChampInt($champs, ['duree', 'Duree']);
+        if (!$this->requiredValues([$id, $titre, $idRayon, $idPublic, $idGenre]) || is_null($duree)) {
+            return null;
+        }
+        $paramsDocument = [
+            'id' => $id,
+            'titre' => $titre,
+            'image' => $image,
+            'idRayon' => $idRayon,
+            'idPublic' => $idPublic,
+            'idGenre' => $idGenre
+        ];
+        $paramsSpecific = [
+            'id' => $id,
+            'synopsis' => $synopsis,
+            'realisateur' => $realisateur,
+            'duree' => $duree
+        ];
+        $operations = [
+            ['sql' => "insert into document (id, titre, image, idRayon, idPublic, idGenre) values (:id, :titre, :image, :idRayon, :idPublic, :idGenre)", 'params' => $paramsDocument, 'mustAffect' => true],
+            ['sql' => "insert into livres_dvd (id) values (:id)", 'params' => ['id' => $id], 'mustAffect' => true],
+            ['sql' => "insert into dvd (id, synopsis, realisateur, duree) values (:id, :synopsis, :realisateur, :duree)", 'params' => $paramsSpecific, 'mustAffect' => true]
+        ];
+        return $this->conn->updateBDDTransaction($operations);
+    }
+
+    /**
+     * Insertion transactionnelle d'une revue (document + revue).
+     * @param array|null $champs
+     * @return int|null
+     */
+    private function insertRevue(?array $champs) : ?int{
+        if (empty($champs)) {
+            return null;
+        }
+        $id = $this->getChamp($champs, ['id', 'Id']);
+        $titre = $this->getChamp($champs, ['titre', 'Titre']);
+        $image = $this->getChamp($champs, ['image', 'Image']);
+        $idRayon = $this->getChamp($champs, ['idRayon', 'idrayon', 'IdRayon']);
+        $idPublic = $this->getChamp($champs, ['idPublic', 'idpublic', 'IdPublic']);
+        $idGenre = $this->getChamp($champs, ['idGenre', 'idgenre', 'IdGenre']);
+        $periodicite = $this->getChamp($champs, ['periodicite', 'Periodicite']);
+        $delai = $this->getChampInt($champs, ['delaiMiseADispo', 'delaimiseadispo', 'DelaiMiseADispo']);
+        if (!$this->requiredValues([$id, $titre, $idRayon, $idPublic, $idGenre, $periodicite]) || is_null($delai)) {
+            return null;
+        }
+        $paramsDocument = [
+            'id' => $id,
+            'titre' => $titre,
+            'image' => $image,
+            'idRayon' => $idRayon,
+            'idPublic' => $idPublic,
+            'idGenre' => $idGenre
+        ];
+        $paramsSpecific = [
+            'id' => $id,
+            'periodicite' => $periodicite,
+            'delaiMiseADispo' => $delai
+        ];
+        $operations = [
+            ['sql' => "insert into document (id, titre, image, idRayon, idPublic, idGenre) values (:id, :titre, :image, :idRayon, :idPublic, :idGenre)", 'params' => $paramsDocument, 'mustAffect' => true],
+            ['sql' => "insert into revue (id, periodicite, delaiMiseADispo) values (:id, :periodicite, :delaiMiseADispo)", 'params' => $paramsSpecific, 'mustAffect' => true]
+        ];
+        return $this->conn->updateBDDTransaction($operations);
+    }
+
+    /**
+     * Mise à jour transactionnelle d'un livre.
+     * @param string|null $id
+     * @param array|null $champs
+     * @return int|null
+     */
+    private function updateLivre(?string $id, ?array $champs) : ?int{
+        if (is_null($id) || empty($champs) || !$this->existsInTable('livre', $id)) {
+            return null;
+        }
+        $titre = $this->getChamp($champs, ['titre', 'Titre']);
+        $image = $this->getChamp($champs, ['image', 'Image']);
+        $idRayon = $this->getChamp($champs, ['idRayon', 'idrayon', 'IdRayon']);
+        $idPublic = $this->getChamp($champs, ['idPublic', 'idpublic', 'IdPublic']);
+        $idGenre = $this->getChamp($champs, ['idGenre', 'idgenre', 'IdGenre']);
+        $isbn = $this->getChamp($champs, ['isbn', 'ISBN', 'Isbn'], true);
+        $auteur = $this->getChamp($champs, ['auteur', 'Auteur'], true);
+        $collection = $this->getChamp($champs, ['collection', 'Collection'], true);
+        if (!$this->requiredValues([$titre, $idRayon, $idPublic, $idGenre])) {
+            return null;
+        }
+        $operations = [
+            ['sql' => "update document set titre=:titre, image=:image, idRayon=:idRayon, idPublic=:idPublic, idGenre=:idGenre where id=:id", 'params' => ['id' => $id, 'titre' => $titre, 'image' => $image, 'idRayon' => $idRayon, 'idPublic' => $idPublic, 'idGenre' => $idGenre], 'mustAffect' => false],
+            ['sql' => "update livre set ISBN=:isbn, auteur=:auteur, collection=:collection where id=:id", 'params' => ['id' => $id, 'isbn' => $isbn, 'auteur' => $auteur, 'collection' => $collection], 'mustAffect' => false]
+        ];
+        return $this->conn->updateBDDTransaction($operations);
+    }
+
+    /**
+     * Mise à jour transactionnelle d'un dvd.
+     * @param string|null $id
+     * @param array|null $champs
+     * @return int|null
+     */
+    private function updateDvd(?string $id, ?array $champs) : ?int{
+        if (is_null($id) || empty($champs) || !$this->existsInTable('dvd', $id)) {
+            return null;
+        }
+        $titre = $this->getChamp($champs, ['titre', 'Titre']);
+        $image = $this->getChamp($champs, ['image', 'Image']);
+        $idRayon = $this->getChamp($champs, ['idRayon', 'idrayon', 'IdRayon']);
+        $idPublic = $this->getChamp($champs, ['idPublic', 'idpublic', 'IdPublic']);
+        $idGenre = $this->getChamp($champs, ['idGenre', 'idgenre', 'IdGenre']);
+        $synopsis = $this->getChamp($champs, ['synopsis', 'Synopsis'], true);
+        $realisateur = $this->getChamp($champs, ['realisateur', 'Realisateur'], true);
+        $duree = $this->getChampInt($champs, ['duree', 'Duree']);
+        if (!$this->requiredValues([$titre, $idRayon, $idPublic, $idGenre]) || is_null($duree)) {
+            return null;
+        }
+        $operations = [
+            ['sql' => "update document set titre=:titre, image=:image, idRayon=:idRayon, idPublic=:idPublic, idGenre=:idGenre where id=:id", 'params' => ['id' => $id, 'titre' => $titre, 'image' => $image, 'idRayon' => $idRayon, 'idPublic' => $idPublic, 'idGenre' => $idGenre], 'mustAffect' => false],
+            ['sql' => "update dvd set synopsis=:synopsis, realisateur=:realisateur, duree=:duree where id=:id", 'params' => ['id' => $id, 'synopsis' => $synopsis, 'realisateur' => $realisateur, 'duree' => $duree], 'mustAffect' => false]
+        ];
+        return $this->conn->updateBDDTransaction($operations);
+    }
+
+    /**
+     * Mise à jour transactionnelle d'une revue.
+     * @param string|null $id
+     * @param array|null $champs
+     * @return int|null
+     */
+    private function updateRevue(?string $id, ?array $champs) : ?int{
+        if (is_null($id) || empty($champs) || !$this->existsInTable('revue', $id)) {
+            return null;
+        }
+        $titre = $this->getChamp($champs, ['titre', 'Titre']);
+        $image = $this->getChamp($champs, ['image', 'Image']);
+        $idRayon = $this->getChamp($champs, ['idRayon', 'idrayon', 'IdRayon']);
+        $idPublic = $this->getChamp($champs, ['idPublic', 'idpublic', 'IdPublic']);
+        $idGenre = $this->getChamp($champs, ['idGenre', 'idgenre', 'IdGenre']);
+        $periodicite = $this->getChamp($champs, ['periodicite', 'Periodicite']);
+        $delai = $this->getChampInt($champs, ['delaiMiseADispo', 'delaimiseadispo', 'DelaiMiseADispo']);
+        if (!$this->requiredValues([$titre, $idRayon, $idPublic, $idGenre, $periodicite]) || is_null($delai)) {
+            return null;
+        }
+        $operations = [
+            ['sql' => "update document set titre=:titre, image=:image, idRayon=:idRayon, idPublic=:idPublic, idGenre=:idGenre where id=:id", 'params' => ['id' => $id, 'titre' => $titre, 'image' => $image, 'idRayon' => $idRayon, 'idPublic' => $idPublic, 'idGenre' => $idGenre], 'mustAffect' => false],
+            ['sql' => "update revue set periodicite=:periodicite, delaiMiseADispo=:delaiMiseADispo where id=:id", 'params' => ['id' => $id, 'periodicite' => $periodicite, 'delaiMiseADispo' => $delai], 'mustAffect' => false]
+        ];
+        return $this->conn->updateBDDTransaction($operations);
+    }
+
+    /**
+     * Suppression transactionnelle d'un livre avec contrôle des dépendances.
+     * @param array|null $champs
+     * @return int|null
+     */
+    private function deleteLivre(?array $champs) : ?int{
+        $id = $this->extractId($champs);
+        if (is_null($id) || !$this->existsInTable('livre', $id) || $this->documentHasDependencies($id, true)) {
+            return null;
+        }
+        $operations = [
+            ['sql' => "delete from livre where id=:id", 'params' => ['id' => $id], 'mustAffect' => true],
+            ['sql' => "delete from livres_dvd where id=:id", 'params' => ['id' => $id], 'mustAffect' => true],
+            ['sql' => "delete from document where id=:id", 'params' => ['id' => $id], 'mustAffect' => true]
+        ];
+        return $this->conn->updateBDDTransaction($operations);
+    }
+
+    /**
+     * Suppression transactionnelle d'un dvd avec contrôle des dépendances.
+     * @param array|null $champs
+     * @return int|null
+     */
+    private function deleteDvd(?array $champs) : ?int{
+        $id = $this->extractId($champs);
+        if (is_null($id) || !$this->existsInTable('dvd', $id) || $this->documentHasDependencies($id, true)) {
+            return null;
+        }
+        $operations = [
+            ['sql' => "delete from dvd where id=:id", 'params' => ['id' => $id], 'mustAffect' => true],
+            ['sql' => "delete from livres_dvd where id=:id", 'params' => ['id' => $id], 'mustAffect' => true],
+            ['sql' => "delete from document where id=:id", 'params' => ['id' => $id], 'mustAffect' => true]
+        ];
+        return $this->conn->updateBDDTransaction($operations);
+    }
+
+    /**
+     * Suppression transactionnelle d'une revue avec contrôle des dépendances.
+     * @param array|null $champs
+     * @return int|null
+     */
+    private function deleteRevue(?array $champs) : ?int{
+        $id = $this->extractId($champs);
+        if (is_null($id) || !$this->existsInTable('revue', $id) || $this->documentHasDependencies($id, false)) {
+            return null;
+        }
+        $operations = [
+            ['sql' => "delete from revue where id=:id", 'params' => ['id' => $id], 'mustAffect' => true],
+            ['sql' => "delete from document where id=:id", 'params' => ['id' => $id], 'mustAffect' => true]
+        ];
+        return $this->conn->updateBDDTransaction($operations);
+    }
+
+    /**
+     * Récupère l'identifiant à partir d'un tableau de champs.
+     * @param array|null $champs
+     * @return string|null
+     */
+    private function extractId(?array $champs) : ?string{
+        if (empty($champs)) {
+            return null;
+        }
+        return $this->getChamp($champs, ['id', 'Id']);
+    }
+
+    /**
+     * Contrôle l'existence d'un id dans une table donnée.
+     * @param string $table
+     * @param string $id
+     * @return bool
+     */
+    private function existsInTable(string $table, string $id) : bool{
+        $result = $this->conn->queryBDD("select count(*) as nb from $table where id = :id", ['id' => $id]);
+        if (is_null($result) || empty($result)) {
+            return false;
+        }
+        return ((int)($result[0]['nb'] ?? 0)) > 0;
+    }
+
+    /**
+     * Contrôle les dépendances interdisant la suppression d'un document.
+     * @param string $id
+     * @param bool $checkCommandeLivreDvd true pour contrôler commandedocument
+     * @return bool true si le document ne peut pas être supprimé
+     */
+    private function documentHasDependencies(string $id, bool $checkCommandeLivreDvd) : bool{
+        $exemplaires = $this->conn->queryBDD("select count(*) as nb from exemplaire where id = :id", ['id' => $id]);
+        $nbExemplaires = (int)($exemplaires[0]['nb'] ?? 0);
+        if ($nbExemplaires > 0) {
+            return true;
+        }
+        if ($checkCommandeLivreDvd) {
+            $commandes = $this->conn->queryBDD("select count(*) as nb from commandedocument where idLivreDvd = :id", ['id' => $id]);
+            $nbCommandes = (int)($commandes[0]['nb'] ?? 0);
+            return $nbCommandes > 0;
+        }
+        $abonnements = $this->conn->queryBDD("select count(*) as nb from abonnement where idRevue = :id", ['id' => $id]);
+        $nbAbonnements = (int)($abonnements[0]['nb'] ?? 0);
+        return $nbAbonnements > 0;
+    }
+
+    /**
+     * Retourne la première valeur trouvée parmi plusieurs noms de champ.
+     * @param array $source
+     * @param array $noms
+     * @param bool $nullable
+     * @return string|null
+     */
+    private function getChamp(array $source, array $noms, bool $nullable=false) : ?string{
+        foreach ($noms as $nom){
+            if (array_key_exists($nom, $source)){
+                $value = trim((string)$source[$nom]);
+                if ($value === '' && !$nullable){
+                    return null;
+                }
+                return $value;
+            }
+        }
+        return $nullable ? '' : null;
+    }
+
+    /**
+     * Retourne un entier à partir d'un ensemble de noms possibles.
+     * @param array $source
+     * @param array $noms
+     * @return int|null
+     */
+    private function getChampInt(array $source, array $noms) : ?int{
+        $value = $this->getChamp($source, $noms);
+        if (is_null($value) || !is_numeric($value)) {
+            return null;
+        }
+        return (int)$value;
+    }
+
+    /**
+     * Vérifie que toutes les valeurs requises sont présentes.
+     * @param array $values
+     * @return bool
+     */
+    private function requiredValues(array $values) : bool{
+        foreach ($values as $value){
+            if (is_null($value) || trim((string)$value) === ''){
+                return false;
+            }
+        }
+        return true;
     }		    
     
 }

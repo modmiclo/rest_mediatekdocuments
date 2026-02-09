@@ -91,6 +91,53 @@ class Connexion {
             return null;
         }
     }
+
+    /**
+     * Exécute plusieurs mises à jour SQL dans une transaction.
+     * Chaque opération est un tableau :
+     * - sql (string) : requête préparée
+     * - params (array|null) : paramètres nommés
+     * - mustAffect (bool) : true pour exiger au moins une ligne impactée
+     * @param array $operations
+     * @return int|null nombre total de lignes impactées ou null si rollback
+     */
+    public function updateBDDTransaction(array $operations) : ?int{
+        if (empty($operations)) {
+            return null;
+        }
+        try{
+            $this->conn->beginTransaction();
+            $total = 0;
+            foreach($operations as $operation){
+                $sql = $operation['sql'] ?? '';
+                $params = $operation['params'] ?? null;
+                $mustAffect = (bool)($operation['mustAffect'] ?? false);
+                if ($sql === ''){
+                    $this->conn->rollBack();
+                    return null;
+                }
+                $result = $this->prepareRequete($sql, $params);
+                $ok = $result->execute();
+                if($ok !== true){
+                    $this->conn->rollBack();
+                    return null;
+                }
+                $count = $result->rowCount();
+                if($mustAffect && $count <= 0){
+                    $this->conn->rollBack();
+                    return null;
+                }
+                $total += $count;
+            }
+            $this->conn->commit();
+            return $total;
+        }catch(Exception $e){
+            if ($this->conn->inTransaction()){
+                $this->conn->rollBack();
+            }
+            return null;
+        }
+    }
 	
     /**
      * prépare la requête

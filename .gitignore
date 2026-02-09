@@ -1,2 +1,8 @@
 /nbproject/private/
 /vendor/
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
