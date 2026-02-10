@@ -40,6 +40,10 @@ class MyAccessBDD extends AccessBDD {
                 return $this->selectAllRevues();
             case "exemplaire" :
                 return $this->selectExemplairesRevue($champs);
+            case "commandedocument" :
+                return $this->selectCommandesDocumentByLivreDvd($champs);
+            case "suivi" :
+                return $this->selectAllSuivis();
             case "genre" :
             case "public" :
             case "rayon" :
@@ -69,6 +73,8 @@ class MyAccessBDD extends AccessBDD {
                 return $this->insertDvd($champs);
             case "revue" :
                 return $this->insertRevue($champs);
+            case "commandedocument" :
+                return $this->insertCommandeDocument($champs);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
@@ -93,6 +99,8 @@ class MyAccessBDD extends AccessBDD {
                 return $this->updateDvd($id, $champs);
             case "revue" :
                 return $this->updateRevue($id, $champs);
+            case "commandedocument" :
+                return $this->updateCommandeDocumentSuivi($id, $champs);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
@@ -116,6 +124,8 @@ class MyAccessBDD extends AccessBDD {
                 return $this->deleteDvd($champs);
             case "revue" :
                 return $this->deleteRevue($champs);
+            case "commandedocument" :
+                return $this->deleteCommandeDocument($champs);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
@@ -229,6 +239,15 @@ class MyAccessBDD extends AccessBDD {
         $requete = "select * from $table order by libelle;";		
         return $this->conn->queryBDD($requete);	    
     }
+
+    /**
+     * Récupère les étapes de suivi ordonnées.
+     * @return array|null
+     */
+    private function selectAllSuivis() : ?array{
+        $requete = "select id, libelle, ordre from suivi order by ordre;";
+        return $this->conn->queryBDD($requete);
+    }
     
     /**
      * récupère toutes les lignes de la table Livre et les tables associées
@@ -293,6 +312,28 @@ class MyAccessBDD extends AccessBDD {
         $requete .= "where e.id = :id ";
         $requete .= "order by e.dateAchat DESC";
         return $this->conn->queryBDD($requete, $champNecessaire);
+    }
+
+    /**
+     * Récupère les commandes d'un livre/dvd, triées par date décroissante.
+     * @param array|null $champs
+     * @return array|null
+     */
+    private function selectCommandesDocumentByLivreDvd(?array $champs) : ?array{
+        if (empty($champs)) {
+            return null;
+        }
+        $idLivreDvd = $this->getChamp($champs, ['idLivreDvd', 'idlivredvd', 'id']);
+        if (is_null($idLivreDvd) || !$this->existsInTable('livres_dvd', $idLivreDvd)) {
+            return null;
+        }
+        $requete = "select c.id, c.dateCommande, c.montant, cd.nbExemplaire, cd.idLivreDvd, cd.idSuivi, s.libelle as etapeSuivi, s.ordre as ordreSuivi ";
+        $requete .= "from commande c ";
+        $requete .= "join commandedocument cd on cd.id = c.id ";
+        $requete .= "join suivi s on s.id = cd.idSuivi ";
+        $requete .= "where cd.idLivreDvd = :idLivreDvd ";
+        $requete .= "order by c.dateCommande desc, c.id desc;";
+        return $this->conn->queryBDD($requete, ['idLivreDvd' => $idLivreDvd]);
     }
 
     /**
@@ -422,6 +463,37 @@ class MyAccessBDD extends AccessBDD {
     }
 
     /**
+     * Insertion transactionnelle d'une commande de livre/dvd (commande + commandedocument).
+     * @param array|null $champs
+     * @return int|null
+     */
+    private function insertCommandeDocument(?array $champs) : ?int{
+        if (empty($champs)) {
+            return null;
+        }
+        $id = $this->getChamp($champs, ['id', 'Id']);
+        $dateCommande = $this->getChamp($champs, ['dateCommande', 'datecommande', 'DateCommande']);
+        $montant = $this->getChampFloat($champs, ['montant', 'Montant']);
+        $nbExemplaire = $this->getChampInt($champs, ['nbExemplaire', 'nbexemplaire', 'NbExemplaire']);
+        $idLivreDvd = $this->getChamp($champs, ['idLivreDvd', 'idlivredvd', 'IdLivreDvd']);
+        $idSuivi = $this->getChamp($champs, ['idSuivi', 'idsuivi', 'IdSuivi'], true);
+        if ($idSuivi === '') {
+            $idSuivi = '00001';
+        }
+        if (!$this->requiredValues([$id, $dateCommande, $idLivreDvd, $idSuivi]) || is_null($montant) || is_null($nbExemplaire) || $nbExemplaire <= 0 || $montant < 0) {
+            return null;
+        }
+        if ($this->existsInTable('commande', $id) || !$this->existsInTable('livres_dvd', $idLivreDvd) || !$this->existsInTable('suivi', $idSuivi)) {
+            return null;
+        }
+        $operations = [
+            ['sql' => "insert into commande (id, dateCommande, montant) values (:id, :dateCommande, :montant)", 'params' => ['id' => $id, 'dateCommande' => $dateCommande, 'montant' => $montant], 'mustAffect' => true],
+            ['sql' => "insert into commandedocument (id, nbExemplaire, idLivreDvd, idSuivi) values (:id, :nbExemplaire, :idLivreDvd, :idSuivi)", 'params' => ['id' => $id, 'nbExemplaire' => $nbExemplaire, 'idLivreDvd' => $idLivreDvd, 'idSuivi' => $idSuivi], 'mustAffect' => true]
+        ];
+        return $this->conn->updateBDDTransaction($operations);
+    }
+
+    /**
      * Mise à jour transactionnelle d'un livre.
      * @param string|null $id
      * @param array|null $champs
@@ -505,6 +577,23 @@ class MyAccessBDD extends AccessBDD {
     }
 
     /**
+     * Met à jour l'étape de suivi d'une commande de document.
+     * @param string|null $id
+     * @param array|null $champs
+     * @return int|null
+     */
+    private function updateCommandeDocumentSuivi(?string $id, ?array $champs) : ?int{
+        if (is_null($id) || empty($champs) || !$this->existsInTable('commandedocument', $id)) {
+            return null;
+        }
+        $idSuivi = $this->getChamp($champs, ['idSuivi', 'idsuivi', 'IdSuivi']);
+        if (is_null($idSuivi) || !$this->existsInTable('suivi', $idSuivi)) {
+            return null;
+        }
+        return $this->conn->updateBDD("update commandedocument set idSuivi=:idSuivi where id=:id", ['id' => $id, 'idSuivi' => $idSuivi]);
+    }
+
+    /**
      * Suppression transactionnelle d'un livre avec contrôle des dépendances.
      * @param array|null $champs
      * @return int|null
@@ -555,6 +644,20 @@ class MyAccessBDD extends AccessBDD {
             ['sql' => "delete from document where id=:id", 'params' => ['id' => $id], 'mustAffect' => true]
         ];
         return $this->conn->updateBDDTransaction($operations);
+    }
+
+    /**
+     * Supprime une commande de document via la table mère commande.
+     * Le trigger gère la suppression de commandedocument et les contrôles métier.
+     * @param array|null $champs
+     * @return int|null
+     */
+    private function deleteCommandeDocument(?array $champs) : ?int{
+        $id = $this->extractId($champs);
+        if (is_null($id) || !$this->existsInTable('commandedocument', $id)) {
+            return null;
+        }
+        return $this->conn->updateBDD("delete from commande where id=:id", ['id' => $id]);
     }
 
     /**
@@ -637,6 +740,20 @@ class MyAccessBDD extends AccessBDD {
             return null;
         }
         return (int)$value;
+    }
+
+    /**
+     * Retourne un décimal à partir d'un ensemble de noms possibles.
+     * @param array $source
+     * @param array $noms
+     * @return float|null
+     */
+    private function getChampFloat(array $source, array $noms) : ?float{
+        $value = $this->getChamp($source, $noms);
+        if (is_null($value) || !is_numeric($value)) {
+            return null;
+        }
+        return (float)$value;
     }
 
     /**

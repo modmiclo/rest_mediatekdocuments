@@ -48,13 +48,36 @@ CREATE TABLE commande (
 -- --------------------------------------------------------
 
 --
+-- Structure de la table suivi
+--
+
+CREATE TABLE suivi (
+  id char(5) NOT NULL,
+  libelle varchar(20) NOT NULL,
+  ordre tinyint(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Déchargement des données de la table suivi
+--
+
+INSERT INTO suivi (id, libelle, ordre) VALUES
+('00001', 'en cours', 1),
+('00002', 'relancee', 2),
+('00003', 'livree', 3),
+('00004', 'reglee', 4);
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table commandedocument
 --
 
 CREATE TABLE commandedocument (
   id varchar(5) NOT NULL,
   nbExemplaire int(11) DEFAULT NULL,
-  idLivreDvd varchar(10) NOT NULL
+  idLivreDvd varchar(10) NOT NULL,
+  idSuivi char(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -429,7 +452,8 @@ ALTER TABLE commande
 --
 ALTER TABLE commandedocument
   ADD PRIMARY KEY (id),
-  ADD KEY idLivreDvd (idLivreDvd);
+  ADD KEY idLivreDvd (idLivreDvd),
+  ADD KEY idSuivi (idSuivi);
 
 --
 -- Index pour la table document
@@ -496,6 +520,13 @@ ALTER TABLE revue
   ADD PRIMARY KEY (id);
 
 --
+-- Index pour la table suivi
+--
+ALTER TABLE suivi
+  ADD PRIMARY KEY (id),
+  ADD UNIQUE KEY uk_suivi_ordre (ordre);
+
+--
 -- Contraintes pour les tables déchargées
 --
 
@@ -511,7 +542,8 @@ ALTER TABLE abonnement
 --
 ALTER TABLE commandedocument
   ADD CONSTRAINT commandedocument_ibfk_1 FOREIGN KEY (id) REFERENCES commande (id),
-  ADD CONSTRAINT commandedocument_ibfk_2 FOREIGN KEY (idLivreDvd) REFERENCES livres_dvd (id);
+  ADD CONSTRAINT commandedocument_ibfk_2 FOREIGN KEY (idLivreDvd) REFERENCES livres_dvd (id),
+  ADD CONSTRAINT commandedocument_ibfk_3 FOREIGN KEY (idSuivi) REFERENCES suivi (id);
 
 --
 -- Contraintes pour la table document
@@ -551,6 +583,98 @@ ALTER TABLE livres_dvd
 --
 ALTER TABLE revue
   ADD CONSTRAINT revue_ibfk_1 FOREIGN KEY (id) REFERENCES document (id);
+
+--
+-- Contraintes pour la table suivi
+--
+ALTER TABLE suivi
+  ADD CONSTRAINT chk_suivi_ordre CHECK (ordre BETWEEN 1 AND 4);
+
+DROP TRIGGER IF EXISTS trg_commande_delete_commandedocument;
+DROP TRIGGER IF EXISTS trg_commandedocument_before_insert;
+DROP TRIGGER IF EXISTS trg_commandedocument_before_update;
+DROP TRIGGER IF EXISTS trg_commandedocument_before_delete;
+DROP TRIGGER IF EXISTS trg_commandedocument_after_update_livree;
+
+DELIMITER //
+
+CREATE TRIGGER trg_commande_delete_commandedocument
+BEFORE DELETE ON commande
+FOR EACH ROW
+BEGIN
+  DELETE FROM commandedocument WHERE id = OLD.id;
+END//
+
+CREATE TRIGGER trg_commandedocument_before_insert
+BEFORE INSERT ON commandedocument
+FOR EACH ROW
+BEGIN
+  IF NEW.idSuivi IS NULL OR NEW.idSuivi = '' THEN
+    SET NEW.idSuivi = '00001';
+  END IF;
+END//
+
+CREATE TRIGGER trg_commandedocument_before_update
+BEFORE UPDATE ON commandedocument
+FOR EACH ROW
+BEGIN
+  DECLARE ordreOld TINYINT;
+  DECLARE ordreNew TINYINT;
+  SELECT ordre INTO ordreOld FROM suivi WHERE id = OLD.idSuivi;
+  SELECT ordre INTO ordreNew FROM suivi WHERE id = NEW.idSuivi;
+
+  IF ordreOld IS NULL OR ordreNew IS NULL THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Etape de suivi invalide.';
+  END IF;
+
+  IF ordreNew < ordreOld THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Impossible de revenir a une etape precedente.';
+  END IF;
+
+  IF ordreNew = 4 AND ordreOld < 3 THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Une commande doit etre livree avant d etre reglee.';
+  END IF;
+END//
+
+CREATE TRIGGER trg_commandedocument_before_delete
+BEFORE DELETE ON commandedocument
+FOR EACH ROW
+BEGIN
+  DECLARE ordreOld TINYINT;
+  SELECT ordre INTO ordreOld FROM suivi WHERE id = OLD.idSuivi;
+  IF ordreOld >= 3 THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Suppression interdite pour une commande livree ou reglee.';
+  END IF;
+END//
+
+CREATE TRIGGER trg_commandedocument_after_update_livree
+AFTER UPDATE ON commandedocument
+FOR EACH ROW
+BEGIN
+  DECLARE idSuiviLivree CHAR(5) DEFAULT '00003';
+  DECLARE compteur INT DEFAULT 0;
+  DECLARE numeroCourant INT DEFAULT 0;
+  DECLARE dateCommandeValue DATE;
+
+  IF NEW.idSuivi = idSuiviLivree AND OLD.idSuivi <> idSuiviLivree THEN
+    SELECT IFNULL(MAX(numero), 0) INTO numeroCourant
+    FROM exemplaire
+    WHERE id = NEW.idLivreDvd;
+
+    SELECT dateCommande INTO dateCommandeValue
+    FROM commande
+    WHERE id = NEW.id;
+
+    WHILE compteur < NEW.nbExemplaire DO
+      SET numeroCourant = numeroCourant + 1;
+      INSERT INTO exemplaire (id, numero, dateAchat, photo, idEtat)
+      VALUES (NEW.idLivreDvd, numeroCourant, dateCommandeValue, '', '00001');
+      SET compteur = compteur + 1;
+    END WHILE;
+  END IF;
+END//
+
+DELIMITER ;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
