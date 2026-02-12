@@ -602,6 +602,7 @@ CREATE TRIGGER trg_commande_delete_commandedocument
 BEFORE DELETE ON commande
 FOR EACH ROW
 BEGIN
+  DELETE FROM abonnement WHERE id = OLD.id;
   DELETE FROM commandedocument WHERE id = OLD.id;
 END//
 

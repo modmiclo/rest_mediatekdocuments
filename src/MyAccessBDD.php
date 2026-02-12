@@ -42,6 +42,8 @@ class MyAccessBDD extends AccessBDD {
                 return $this->selectExemplairesRevue($champs);
             case "commandedocument" :
                 return $this->selectCommandesDocumentByLivreDvd($champs);
+            case "abonnement" :
+                return $this->selectAbonnementsRevue($champs);
             case "suivi" :
                 return $this->selectAllSuivis();
             case "genre" :
@@ -75,6 +77,8 @@ class MyAccessBDD extends AccessBDD {
                 return $this->insertRevue($champs);
             case "commandedocument" :
                 return $this->insertCommandeDocument($champs);
+            case "abonnement" :
+                return $this->insertAbonnement($champs);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
@@ -126,6 +130,8 @@ class MyAccessBDD extends AccessBDD {
                 return $this->deleteRevue($champs);
             case "commandedocument" :
                 return $this->deleteCommandeDocument($champs);
+            case "abonnement" :
+                return $this->deleteAbonnement($champs);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
@@ -337,6 +343,38 @@ class MyAccessBDD extends AccessBDD {
     }
 
     /**
+     * Récupère les abonnements de revue triés par date de commande décroissante.
+     * Si champs['finProche']=true, retourne les revues dont l'abonnement finit dans moins de 30 jours.
+     * @param array|null $champs
+     * @return array|null
+     */
+    private function selectAbonnementsRevue(?array $champs) : ?array{
+        $finProche = $this->getChampBool($champs, ['finProche', 'finproche']);
+        if ($finProche) {
+            $requete = "select d.titre as titreRevue, a.idRevue, a.dateFinAbonnement ";
+            $requete .= "from abonnement a ";
+            $requete .= "join document d on d.id = a.idRevue ";
+            $requete .= "where a.dateFinAbonnement >= CURDATE() and a.dateFinAbonnement <= DATE_ADD(CURDATE(), INTERVAL 30 DAY) ";
+            $requete .= "order by a.dateFinAbonnement asc, d.titre asc;";
+            return $this->conn->queryBDD($requete);
+        }
+
+        if (empty($champs)) {
+            return $this->conn->queryBDD("select id, dateFinAbonnement, idRevue from abonnement order by id desc;");
+        }
+        $idRevue = $this->getChamp($champs, ['idRevue', 'idrevue', 'id']);
+        if (is_null($idRevue) || !$this->existsInTable('revue', $idRevue)) {
+            return null;
+        }
+        $requete = "select c.id, c.dateCommande, c.montant, a.dateFinAbonnement, a.idRevue ";
+        $requete .= "from abonnement a ";
+        $requete .= "join commande c on c.id = a.id ";
+        $requete .= "where a.idRevue = :idRevue ";
+        $requete .= "order by c.dateCommande desc, c.id desc;";
+        return $this->conn->queryBDD($requete, ['idRevue' => $idRevue]);
+    }
+
+    /**
      * Insertion transactionnelle d'un livre (document + livres_dvd + livre).
      * @param array|null $champs
      * @return int|null
@@ -489,6 +527,38 @@ class MyAccessBDD extends AccessBDD {
         $operations = [
             ['sql' => "insert into commande (id, dateCommande, montant) values (:id, :dateCommande, :montant)", 'params' => ['id' => $id, 'dateCommande' => $dateCommande, 'montant' => $montant], 'mustAffect' => true],
             ['sql' => "insert into commandedocument (id, nbExemplaire, idLivreDvd, idSuivi) values (:id, :nbExemplaire, :idLivreDvd, :idSuivi)", 'params' => ['id' => $id, 'nbExemplaire' => $nbExemplaire, 'idLivreDvd' => $idLivreDvd, 'idSuivi' => $idSuivi], 'mustAffect' => true]
+        ];
+        return $this->conn->updateBDDTransaction($operations);
+    }
+
+    /**
+     * Insertion transactionnelle d'un abonnement (commande + abonnement).
+     * @param array|null $champs
+     * @return int|null
+     */
+    private function insertAbonnement(?array $champs) : ?int{
+        if (empty($champs)) {
+            return null;
+        }
+        $id = $this->getChamp($champs, ['id', 'Id']);
+        $dateCommande = $this->getChamp($champs, ['dateCommande', 'datecommande', 'DateCommande']);
+        $montant = $this->getChampFloat($champs, ['montant', 'Montant']);
+        $dateFinAbonnement = $this->getChamp($champs, ['dateFinAbonnement', 'datefinabonnement', 'DateFinAbonnement']);
+        $idRevue = $this->getChamp($champs, ['idRevue', 'idrevue', 'IdRevue']);
+
+        if (!$this->requiredValues([$id, $dateCommande, $dateFinAbonnement, $idRevue]) || is_null($montant) || $montant < 0) {
+            return null;
+        }
+        if (strtotime($dateFinAbonnement) < strtotime($dateCommande)) {
+            return null;
+        }
+        if ($this->existsInTable('commande', $id) || !$this->existsInTable('revue', $idRevue)) {
+            return null;
+        }
+
+        $operations = [
+            ['sql' => "insert into commande (id, dateCommande, montant) values (:id, :dateCommande, :montant)", 'params' => ['id' => $id, 'dateCommande' => $dateCommande, 'montant' => $montant], 'mustAffect' => true],
+            ['sql' => "insert into abonnement (id, dateFinAbonnement, idRevue) values (:id, :dateFinAbonnement, :idRevue)", 'params' => ['id' => $id, 'dateFinAbonnement' => $dateFinAbonnement, 'idRevue' => $idRevue], 'mustAffect' => true]
         ];
         return $this->conn->updateBDDTransaction($operations);
     }
@@ -661,6 +731,38 @@ class MyAccessBDD extends AccessBDD {
     }
 
     /**
+     * Supprime un abonnement si aucun exemplaire n'est dans sa période.
+     * @param array|null $champs
+     * @return int|null
+     */
+    private function deleteAbonnement(?array $champs) : ?int{
+        $id = $this->extractId($champs);
+        if (is_null($id) || !$this->existsInTable('abonnement', $id)) {
+            return null;
+        }
+        $requete = "select a.idRevue, c.dateCommande, a.dateFinAbonnement ";
+        $requete .= "from abonnement a join commande c on c.id = a.id where a.id = :id";
+        $rows = $this->conn->queryBDD($requete, ['id' => $id]);
+        if (is_null($rows) || empty($rows)) {
+            return null;
+        }
+        $abonnement = $rows[0];
+        $count = $this->conn->queryBDD(
+            "select count(*) as nb from exemplaire where id = :idRevue and dateAchat between :dateCommande and :dateFinAbonnement",
+            [
+                'idRevue' => $abonnement['idRevue'],
+                'dateCommande' => $abonnement['dateCommande'],
+                'dateFinAbonnement' => $abonnement['dateFinAbonnement']
+            ]
+        );
+        $nb = (int)($count[0]['nb'] ?? 0);
+        if ($nb > 0) {
+            return null;
+        }
+        return $this->conn->updateBDD("delete from commande where id=:id", ['id' => $id]);
+    }
+
+    /**
      * Récupère l'identifiant à partir d'un tableau de champs.
      * @param array|null $champs
      * @return string|null
@@ -754,6 +856,25 @@ class MyAccessBDD extends AccessBDD {
             return null;
         }
         return (float)$value;
+    }
+
+    /**
+     * Retourne un booléen à partir d'un ensemble de noms possibles.
+     * @param array|null $source
+     * @param array $noms
+     * @return bool
+     */
+    private function getChampBool(?array $source, array $noms) : bool{
+        if (empty($source)) {
+            return false;
+        }
+        foreach ($noms as $nom) {
+            if (array_key_exists($nom, $source)) {
+                $value = strtolower(trim((string)$source[$nom]));
+                return ($value === '1' || $value === 'true' || $value === 'yes' || $value === 'oui');
+            }
+        }
+        return false;
     }
 
     /**
