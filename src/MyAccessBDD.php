@@ -46,10 +46,13 @@ class MyAccessBDD extends AccessBDD {
                 return $this->selectAbonnementsRevue($champs);
             case "suivi" :
                 return $this->selectAllSuivis();
+            case "utilisateur" :
+                return $this->selectUtilisateurAuthentifie($champs);
             case "genre" :
             case "public" :
             case "rayon" :
             case "etat" :
+            case "service" :
                 // select portant sur une table contenant juste id et libelle
                 return $this->selectTableSimple($table);
             case "" :
@@ -257,6 +260,28 @@ class MyAccessBDD extends AccessBDD {
     private function selectAllSuivis() : ?array{
         $requete = "select id, libelle, ordre from suivi order by ordre;";
         return $this->conn->queryBDD($requete);
+    }
+
+    /**
+     * Récupère l'utilisateur authentifié avec son service.
+     * @param array|null $champs
+     * @return array|null
+     */
+    private function selectUtilisateurAuthentifie(?array $champs) : ?array{
+        if (empty($champs)) {
+            return null;
+        }
+        $login = $this->getChamp($champs, ['login', 'Login', 'username', 'identifiant']);
+        $motDePasse = $this->getChamp($champs, ['motDePasse', 'motdepasse', 'password', 'pwd', 'mdp']);
+        if (!$this->requiredValues([$login, $motDePasse])) {
+            return null;
+        }
+        $requete = "select u.id, u.login, u.nom, u.prenom, u.idService, s.libelle as service ";
+        $requete .= "from utilisateur u ";
+        $requete .= "join service s on s.id = u.idService ";
+        $requete .= "where u.login = :login and u.motDePasse = :motDePasse and u.actif = 1 ";
+        $requete .= "limit 1;";
+        return $this->conn->queryBDD($requete, ['login' => $login, 'motDePasse' => $motDePasse]);
     }
     
     /**

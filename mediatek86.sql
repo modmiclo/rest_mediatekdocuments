@@ -189,6 +189,49 @@ INSERT INTO etat (id, libelle) VALUES
 -- --------------------------------------------------------
 
 --
+-- Structure de la table service
+--
+
+CREATE TABLE service (
+  id char(5) NOT NULL,
+  libelle varchar(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dechargement des donnees de la table service
+--
+
+INSERT INTO service (id, libelle) VALUES
+('S0001', 'Administratif'),
+('S0002', 'Pret'),
+('S0003', 'Culture');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table utilisateur
+--
+
+CREATE TABLE utilisateur (
+  id char(5) NOT NULL,
+  login varchar(30) NOT NULL,
+  motDePasse varchar(60) NOT NULL,
+  nom varchar(40) NOT NULL,
+  prenom varchar(40) NOT NULL,
+  idService char(5) NOT NULL,
+  actif tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dechargement des donnees de la table utilisateur
+--
+
+INSERT INTO utilisateur (id, login, motDePasse, nom, prenom, idService, actif) VALUES
+('U0001', 'admin', 'adminpwd', 'Martin', 'Alice', 'S0001', 1),
+('U0002', 'pret', 'pretpwd', 'Bernard', 'Louis', 'S0002', 1),
+('U0003', 'culture', 'culturepwd', 'Dubois', 'Emma', 'S0003', 1);
+
+--
 -- Structure de la table exemplaire
 --
 
@@ -527,6 +570,21 @@ ALTER TABLE suivi
   ADD UNIQUE KEY uk_suivi_ordre (ordre);
 
 --
+-- Index pour la table service
+--
+ALTER TABLE service
+  ADD PRIMARY KEY (id),
+  ADD UNIQUE KEY uk_service_libelle (libelle);
+
+--
+-- Index pour la table utilisateur
+--
+ALTER TABLE utilisateur
+  ADD PRIMARY KEY (id),
+  ADD UNIQUE KEY uk_utilisateur_login (login),
+  ADD KEY idService (idService);
+
+--
 -- Contraintes pour les tables déchargées
 --
 
@@ -589,6 +647,12 @@ ALTER TABLE revue
 --
 ALTER TABLE suivi
   ADD CONSTRAINT chk_suivi_ordre CHECK (ordre BETWEEN 1 AND 4);
+
+--
+-- Contraintes pour la table utilisateur
+--
+ALTER TABLE utilisateur
+  ADD CONSTRAINT utilisateur_ibfk_1 FOREIGN KEY (idService) REFERENCES service (id);
 
 DROP TRIGGER IF EXISTS trg_commande_delete_commandedocument;
 DROP TRIGGER IF EXISTS trg_commandedocument_before_insert;
