@@ -39,7 +39,7 @@ class MyAccessBDD extends AccessBDD {
             case "revue" :
                 return $this->selectAllRevues();
             case "exemplaire" :
-                return $this->selectExemplairesRevue($champs);
+                return $this->selectExemplairesDocument($champs);
             case "commandedocument" :
                 return $this->selectCommandesDocumentByLivreDvd($champs);
             case "abonnement" :
@@ -105,6 +105,8 @@ class MyAccessBDD extends AccessBDD {
                 return $this->updateRevue($id, $champs);
             case "commandedocument" :
                 return $this->updateCommandeDocumentSuivi($id, $champs);
+            case "exemplaire" :
+                return $this->updateExemplaireEtat($id, $champs);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
@@ -132,6 +134,8 @@ class MyAccessBDD extends AccessBDD {
                 return $this->deleteCommandeDocument($champs);
             case "abonnement" :
                 return $this->deleteAbonnement($champs);
+            case "exemplaire" :
+                return $this->deleteExemplaire($champs);
             case "" :
                 // return $this->uneFonction(parametres);
             default:                    
@@ -305,7 +309,7 @@ class MyAccessBDD extends AccessBDD {
      * @param array|null $champs 
      * @return array|null
      */
-    private function selectExemplairesRevue(?array $champs) : ?array{
+    private function selectExemplairesDocument(?array $champs) : ?array{
         if(empty($champs)){
             return null;
         }
@@ -313,8 +317,9 @@ class MyAccessBDD extends AccessBDD {
             return null;
         }
         $champNecessaire['id'] = $champs['id'];
-        $requete = "Select e.id, e.numero, e.dateAchat, e.photo, e.idEtat ";
+        $requete = "Select e.id, e.numero, e.dateAchat, e.photo, e.idEtat, et.libelle as etat ";
         $requete .= "from exemplaire e join document d on e.id=d.id ";
+        $requete .= "join etat et on et.id=e.idEtat ";
         $requete .= "where e.id = :id ";
         $requete .= "order by e.dateAchat DESC";
         return $this->conn->queryBDD($requete, $champNecessaire);
@@ -664,6 +669,34 @@ class MyAccessBDD extends AccessBDD {
     }
 
     /**
+     * Met à jour l'état d'un exemplaire.
+     * @param string|null $id
+     * @param array|null $champs
+     * @return int|null
+     */
+    private function updateExemplaireEtat(?string $id, ?array $champs) : ?int{
+        if (is_null($id) || empty($champs)) {
+            return null;
+        }
+        $numero = $this->getChampInt($champs, ['numero', 'Numero']);
+        $idEtat = $this->getChamp($champs, ['idEtat', 'idetat', 'IdEtat']);
+        if (is_null($numero) || is_null($idEtat) || !$this->existsInTable('etat', $idEtat)) {
+            return null;
+        }
+        $exemplaire = $this->conn->queryBDD(
+            "select id from exemplaire where id = :id and numero = :numero",
+            ['id' => $id, 'numero' => $numero]
+        );
+        if (empty($exemplaire)) {
+            return null;
+        }
+        return $this->conn->updateBDD(
+            "update exemplaire set idEtat=:idEtat where id=:id and numero=:numero",
+            ['idEtat' => $idEtat, 'id' => $id, 'numero' => $numero]
+        );
+    }
+
+    /**
      * Suppression transactionnelle d'un livre avec contrôle des dépendances.
      * @param array|null $champs
      * @return int|null
@@ -760,6 +793,33 @@ class MyAccessBDD extends AccessBDD {
             return null;
         }
         return $this->conn->updateBDD("delete from commande where id=:id", ['id' => $id]);
+    }
+
+    /**
+     * Supprime un exemplaire.
+     * @param array|null $champs
+     * @return int|null
+     */
+    private function deleteExemplaire(?array $champs) : ?int{
+        if (empty($champs)) {
+            return null;
+        }
+        $id = $this->getChamp($champs, ['id', 'Id']);
+        $numero = $this->getChampInt($champs, ['numero', 'Numero']);
+        if (is_null($id) || is_null($numero)) {
+            return null;
+        }
+        $exemplaire = $this->conn->queryBDD(
+            "select id from exemplaire where id = :id and numero = :numero",
+            ['id' => $id, 'numero' => $numero]
+        );
+        if (empty($exemplaire)) {
+            return null;
+        }
+        return $this->conn->updateBDD(
+            "delete from exemplaire where id = :id and numero = :numero",
+            ['id' => $id, 'numero' => $numero]
+        );
     }
 
     /**

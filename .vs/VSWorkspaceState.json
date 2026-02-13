@@ -1,9 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\nbproject",
-    "\\src",
-    "\\vendor"
+    "\\src"
   ],
+  "SelectedNode": "\\src\\MyAccessBDD.php",
   "PreviewInSolutionExplorer": false
 }
