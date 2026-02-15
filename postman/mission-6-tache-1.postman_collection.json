@@ -1,0 +1,491 @@
+﻿{
+  "info": {
+    "name": "MediaTekDocuments API - Mission 6 Tache 1",
+    "_postman_id": "7a9b8a7a-3a89-41ff-b3ef-8d7c2d1fa711",
+    "description": "Collection de tests fonctionnels API pour la mission 6 tache 1 (authentification, lectures, CRUD livre).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "username",
+        "value": "{{authUser}}",
+        "type": "string"
+      },
+      {
+        "key": "password",
+        "value": "{{authPassword}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get('testLivreId')) {",
+          "  const randomSuffix = Math.floor(Math.random() * 900000).toString().padStart(6, '0');",
+          "  pm.collectionVariables.set('testLivreId', `M6${randomSuffix}`);",
+          "}",
+          "if (!pm.collectionVariables.get('dateCommande')) {",
+          "  pm.collectionVariables.set('dateCommande', '2026-02-08');",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost/rest_mediatekdocuments"
+    },
+    {
+      "key": "authUser",
+      "value": "admin"
+    },
+    {
+      "key": "authPassword",
+      "value": "adminpwd"
+    },
+    {
+      "key": "testLivreId",
+      "value": ""
+    },
+    {
+      "key": "genreId",
+      "value": ""
+    },
+    {
+      "key": "publicId",
+      "value": ""
+    },
+    {
+      "key": "rayonId",
+      "value": ""
+    },
+    {
+      "key": "livreTitreInitial",
+      "value": "Livre test mission 6"
+    },
+    {
+      "key": "livreTitreModifie",
+      "value": "Livre test mission 6 modifie"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentification",
+      "item": [
+        {
+          "name": "Auth KO - GET genre",
+          "request": {
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "wrong",
+                  "type": "string"
+                },
+                {
+                  "key": "password",
+                  "value": "wrong",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/genre",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "genre"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP status 200 (payload code 401)', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const data = pm.response.json();",
+                  "pm.test('Code metier 401', function () {",
+                  "  pm.expect(data.code).to.eql(401);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Referentiels",
+      "item": [
+        {
+          "name": "GET genre",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/genre",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "genre"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.test('Code metier 200', function () {",
+                  "  pm.expect(data.code).to.eql(200);",
+                  "});",
+                  "pm.test('Liste non vide', function () {",
+                  "  pm.expect(data.result).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "pm.collectionVariables.set('genreId', data.result[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET public",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/public",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.test('Code metier 200', function () {",
+                  "  pm.expect(data.code).to.eql(200);",
+                  "});",
+                  "pm.test('Liste non vide', function () {",
+                  "  pm.expect(data.result).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "pm.collectionVariables.set('publicId', data.result[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET rayon",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/rayon",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "rayon"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.test('Code metier 200', function () {",
+                  "  pm.expect(data.code).to.eql(200);",
+                  "});",
+                  "pm.test('Liste non vide', function () {",
+                  "  pm.expect(data.result).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "pm.collectionVariables.set('rayonId', data.result[0].id);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CRUD livre de test",
+      "item": [
+        {
+          "name": "POST livre",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "champs",
+                  "value": "{\"id\":\"{{testLivreId}}\",\"titre\":\"{{livreTitreInitial}}\",\"image\":\"\",\"idRayon\":\"{{rayonId}}\",\"idPublic\":\"{{publicId}}\",\"idGenre\":\"{{genreId}}\",\"isbn\":\"ISBN-M6\",\"auteur\":\"Testeur\",\"collection\":\"Mission6\"}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livre",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livre"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.test('Code metier 200', function () {",
+                  "  pm.expect(data.code).to.eql(200);",
+                  "});",
+                  "pm.test('Insertion effectuee', function () {",
+                  "  pm.expect(data.result).to.be.above(0);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET livre (presence livre cree)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/livre",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livre"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.test('Code metier 200', function () {",
+                  "  pm.expect(data.code).to.eql(200);",
+                  "});",
+                  "const id = pm.collectionVariables.get('testLivreId');",
+                  "const trouve = data.result.find(l => l.id === id);",
+                  "pm.test('Livre cree present', function () {",
+                  "  pm.expect(trouve).to.not.be.undefined;",
+                  "});",
+                  "pm.test('Titre initial correct', function () {",
+                  "  pm.expect(trouve.titre).to.eql(pm.collectionVariables.get('livreTitreInitial'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT livre/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "champs",
+                  "value": "{\"titre\":\"{{livreTitreModifie}}\",\"image\":\"\",\"idRayon\":\"{{rayonId}}\",\"idPublic\":\"{{publicId}}\",\"idGenre\":\"{{genreId}}\",\"isbn\":\"ISBN-M6-2\",\"auteur\":\"Testeur2\",\"collection\":\"Mission6B\"}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livre/{{testLivreId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livre",
+                "{{testLivreId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.test('Code metier 200', function () {",
+                  "  pm.expect(data.code).to.eql(200);",
+                  "});",
+                  "pm.test('Mise a jour effectuee', function () {",
+                  "  pm.expect(data.result).to.be.at.least(0);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET livre (controle modification)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/livre",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livre"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "const id = pm.collectionVariables.get('testLivreId');",
+                  "const trouve = data.result.find(l => l.id === id);",
+                  "pm.test('Livre toujours present', function () {",
+                  "  pm.expect(trouve).to.not.be.undefined;",
+                  "});",
+                  "pm.test('Titre modifie', function () {",
+                  "  pm.expect(trouve.titre).to.eql(pm.collectionVariables.get('livreTitreModifie'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE livre/{\"id\":\"...\"}",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/livre/%7B%22id%22%3A%22{{testLivreId}}%22%7D",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livre",
+                "%7B%22id%22%3A%22{{testLivreId}}%22%7D"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.test('Code metier 200', function () {",
+                  "  pm.expect(data.code).to.eql(200);",
+                  "});",
+                  "pm.test('Suppression effectuee', function () {",
+                  "  pm.expect(data.result).to.be.above(0);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET livre (absence livre supprime)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/livre",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livre"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "const id = pm.collectionVariables.get('testLivreId');",
+                  "const trouve = data.result.find(l => l.id === id);",
+                  "pm.test('Livre de test supprime', function () {",
+                  "  pm.expect(trouve).to.be.undefined;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
